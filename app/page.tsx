@@ -1,8 +1,45 @@
+"use client";
+
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { validateSolanaAddress } from "@/lib/solana";
 
 export default function Home() {
+  const [address, setAddress] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAddress(value);
+
+    if (!value.trim()) {
+      setError(null);
+      return;
+    }
+
+    const result = validateSolanaAddress(value);
+    setError(result.valid ? null : result.error);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!address.trim()) {
+      setError("Address cannot be empty");
+      return;
+    }
+
+    const result = validateSolanaAddress(address);
+    if (!result.valid) {
+      setError(result.error);
+      return;
+    }
+
+    // TODO: Navigate to dashboard
+  };
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4">
       <div className="flex w-full max-w-xl flex-col items-center">
@@ -14,17 +51,25 @@ export default function Home() {
           Solana wallet analyzer
         </p>
 
-        <div className="flex w-full max-w-lg gap-2">
-          <Input
-            type="text"
-            placeholder="Enter Solana Address (e.g., HN7c...)"
-            className="h-12 flex-1 text-base"
-          />
-          <Button size="lg" className="h-12 px-6">
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
-        </div>
+        <form onSubmit={handleSubmit} className="w-full max-w-lg">
+          <div className="flex w-full gap-2">
+            <Input
+              type="text"
+              placeholder="Enter Solana Address (e.g., HN7c...)"
+              className="h-12 flex-1 text-base"
+              value={address}
+              onChange={handleInputChange}
+              aria-invalid={error ? true : undefined}
+            />
+            <Button type="submit" size="lg" className="h-12 px-6">
+              <Search className="mr-2 h-4 w-4" />
+              Search
+            </Button>
+          </div>
+          {error && (
+            <p className="mt-2 text-sm text-destructive">{error}</p>
+          )}
+        </form>
       </div>
     </main>
   );
