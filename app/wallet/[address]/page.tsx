@@ -1,3 +1,5 @@
+import { Navbar } from "@/components/Navbar";
+
 interface WalletPageProps {
   params: Promise<{ address: string }>;
 }
@@ -6,7 +8,9 @@ export default async function WalletPage({ params }: WalletPageProps) {
   const { address } = await params;
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-8">
+    <>
+      <Navbar />
+      <main className="flex flex-1 flex-col px-4 py-8">
       <div className="mx-auto w-full max-w-5xl">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="md:col-span-1">
@@ -29,5 +33,6 @@ export default async function WalletPage({ params }: WalletPageProps) {
         </div>
       </div>
     </main>
+    </>
   );
 }
