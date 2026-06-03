@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { validateSolanaAddress } from "@/lib/solana";
 
 export default function Home() {
   const [address, setAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -23,7 +26,9 @@ export default function Home() {
     setError(result.valid ? null : result.error);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const isAddressValid = address.trim() && !error;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!address.trim()) {
@@ -37,7 +42,8 @@ export default function Home() {
       return;
     }
 
-    // TODO: Navigate to dashboard
+    setIsLoading(true);
+    router.push(`/wallet/${encodeURIComponent(result.address)}`);
   };
 
   return (
@@ -61,9 +67,18 @@ export default function Home() {
               onChange={handleInputChange}
               aria-invalid={error ? true : undefined}
             />
-            <Button type="submit" size="lg" className="h-12 px-6">
-              <Search className="mr-2 h-4 w-4" />
-              Search
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 px-6"
+              disabled={isLoading || !isAddressValid}
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? "Loading..." : "Search"}
             </Button>
           </div>
           {error && (
