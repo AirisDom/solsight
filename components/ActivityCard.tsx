@@ -1,6 +1,6 @@
 import {
-  ArrowDownLeft,
-  ArrowUpRight,
+  ArrowDown,
+  ArrowUp,
   ArrowLeftRight,
   Coins,
   HelpCircle,
@@ -17,7 +17,7 @@ function getTypeIcon(type: TransactionType, direction: TokenDirection) {
     case "SWAP":
       return ArrowLeftRight;
     case "TRANSFER":
-      return direction === "IN" ? ArrowDownLeft : ArrowUpRight;
+      return direction === "IN" ? ArrowDown : ArrowUp;
     case "MINT":
       return Coins;
     default:
