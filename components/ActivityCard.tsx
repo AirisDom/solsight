@@ -62,11 +62,13 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const iconStyles = getDirectionStyles(direction, successful);
   const solscanUrl = `https://solscan.io/tx/${signature}`;
 
+  const cardStyles = successful
+    ? "border bg-card hover:bg-accent/50"
+    : "border-destructive/30 bg-destructive/5 opacity-50 hover:opacity-60";
+
   return (
     <div
-      className={`flex items-center gap-4 rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50 ${
-        !successful ? "opacity-60" : ""
-      }`}
+      className={`relative flex items-center gap-4 rounded-lg p-4 transition-all ${cardStyles}`}
     >
       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconStyles}`}>
         <Icon className="h-5 w-5" />
@@ -74,9 +76,11 @@ export function ActivityCard({ activity }: ActivityCardProps) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="truncate font-medium">{summary}</p>
+          <p className={`truncate font-medium ${!successful ? "line-through decoration-destructive/50" : ""}`}>
+            {summary}
+          </p>
           {!successful && (
-            <span className="shrink-0 rounded bg-destructive/20 px-1.5 py-0.5 text-xs font-medium text-destructive">
+            <span className="shrink-0 rounded-full border border-destructive/50 bg-destructive/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive">
               Failed
             </span>
           )}
