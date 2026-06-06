@@ -19,6 +19,15 @@ const DEX_PROGRAM_IDS: Record<string, string> = {
   'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc': 'Orca',
 };
 
+const NFT_PROGRAM_IDS = new Set([
+  'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
+  'p1exdMJcjVao65QdewkaZRUnU6VPSXhus9n2GzWfh98',
+  'CMZYPASGWeTz7RNGHaRJfCq2XQ5pYK6nDvVQxzkH51zb',
+  'BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY',
+  'CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR',
+  'cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ',
+]);
+
 interface TokenBalanceChange {
   mint: string;
   symbol: string;
@@ -38,7 +47,7 @@ export function parseSignatureInfo(
     timestamp,
     type: 'UNKNOWN' as TransactionType,
     direction: 'NEUTRAL' as TokenDirection,
-    summary: signatureInfo.memo || 'Transaction',
+    summary: signatureInfo.memo || 'Unknown transaction',
     fee: 0,
     successful: signatureInfo.err === null,
   };
@@ -104,6 +113,9 @@ function analyzeTransaction(
   const swapResult = analyzeSwapTransaction(transaction, walletAddress);
   if (swapResult) return swapResult;
 
+  const mintResult = analyzeMintTransaction(transaction, walletAddress);
+  if (mintResult) return mintResult;
+
   const instructions = transaction.transaction.message.instructions;
 
   for (const instruction of instructions) {
@@ -121,7 +133,7 @@ function analyzeTransaction(
   return {
     type: 'UNKNOWN',
     direction: 'NEUTRAL',
-    summary: 'Transaction',
+    summary: 'Unknown transaction',
   };
 }
 
@@ -327,6 +339,104 @@ function analyzeSwapTransaction(
     direction: 'NEUTRAL',
     summary: `Swap via ${dexName}`,
   };
+}
+
+function hasNftProgramInteraction(transaction: ParsedTransactionWithMeta): boolean {
+  const instructions = transaction.transaction.message.instructions;
+
+  for (const instruction of instructions) {
+    const programId = 'programId' in instruction
+      ? instruction.programId.toBase58()
+      : '';
+    if (NFT_PROGRAM_IDS.has(programId)) {
+      return true;
+    }
+  }
+
+  const innerInstructions = transaction.meta?.innerInstructions || [];
+  for (const innerGroup of innerInstructions) {
+    for (const inner of innerGroup.instructions) {
+      const programId = 'programId' in inner
+        ? inner.programId.toBase58()
+        : '';
+      if (NFT_PROGRAM_IDS.has(programId)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function hasMintToInstruction(transaction: ParsedTransactionWithMeta): boolean {
+  const instructions = transaction.transaction.message.instructions;
+
+  for (const instruction of instructions) {
+    if ('parsed' in instruction && instruction.program === 'spl-token') {
+      const parsed = instruction.parsed as { type?: string };
+      if (parsed.type === 'mintTo' || parsed.type === 'mintToChecked') {
+        return true;
+      }
+    }
+  }
+
+  const innerInstructions = transaction.meta?.innerInstructions || [];
+  for (const innerGroup of innerInstructions) {
+    for (const inner of innerGroup.instructions) {
+      if ('parsed' in inner && 'program' in inner && inner.program === 'spl-token') {
+        const parsed = inner.parsed as { type?: string };
+        if (parsed.type === 'mintTo' || parsed.type === 'mintToChecked') {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+function analyzeMintTransaction(
+  transaction: ParsedTransactionWithMeta,
+  walletAddress: string
+): TransactionAnalysis | null {
+  const hasNftProgram = hasNftProgramInteraction(transaction);
+  const hasMintTo = hasMintToInstruction(transaction);
+
+  if (!hasNftProgram && !hasMintTo) {
+    return null;
+  }
+
+  const tokenChanges = getTokenBalanceChanges(transaction, walletAddress);
+  const tokensIn = tokenChanges.filter(t => t.direction === 'IN');
+
+  const isNftMint = hasNftProgram || tokensIn.some(t => t.amount === 1);
+
+  if (isNftMint) {
+    return {
+      type: 'MINT',
+      direction: 'IN',
+      summary: 'Minted NFT',
+    };
+  }
+
+  if (tokensIn.length > 0) {
+    const token = tokensIn[0];
+    return {
+      type: 'MINT',
+      direction: 'IN',
+      summary: `Minted ${formatTokenAmount(token.amount)} ${token.symbol}`,
+    };
+  }
+
+  if (hasMintTo) {
+    return {
+      type: 'MINT',
+      direction: 'NEUTRAL',
+      summary: 'Minted tokens',
+    };
+  }
+
+  return null;
 }
 
 function formatTokenAmount(amount: number): string {
