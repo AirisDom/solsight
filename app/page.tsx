@@ -49,16 +49,16 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4">
       <div className="flex w-full max-w-xl flex-col items-center">
-        <h1 className="mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-6xl font-bold tracking-tight text-transparent sm:text-7xl">
+        <h1 className="mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl">
           SolSight
         </h1>
 
-        <p className="mb-10 text-center text-lg text-muted-foreground">
+        <p className="mb-8 text-center text-base text-muted-foreground sm:mb-10 sm:text-lg">
           Solana wallet analyzer
         </p>
 
         <form onSubmit={handleSubmit} className="w-full max-w-lg">
-          <div className="flex w-full gap-2">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-2">
             <Input
               type="text"
               placeholder="Enter Solana Address (e.g., HN7c...)"
@@ -70,7 +70,7 @@ export default function Home() {
             <Button
               type="submit"
               size="lg"
-              className="h-12 px-6"
+              className="h-12 w-full px-6 sm:w-auto"
               disabled={isLoading || !isAddressValid}
             >
               {isLoading ? (

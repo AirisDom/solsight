@@ -25,17 +25,17 @@ export function WalletProfileCard({ address, solBalance }: WalletProfileCardProp
   };
 
   return (
-    <div className="rounded-xl border border-white/20 bg-white/10 p-6 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-      <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md sm:p-6 dark:border-white/10 dark:bg-white/5">
+      <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm">
         Wallet
       </h2>
 
       <div className="mt-2 flex items-center gap-2">
-        <span className="font-mono text-lg font-semibold">{truncatedAddress}</span>
+        <span className="font-mono text-base font-semibold sm:text-lg">{truncatedAddress}</span>
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 shrink-0"
+          className="h-10 w-10 shrink-0 sm:h-8 sm:w-8"
           onClick={handleCopy}
           aria-label={copied ? "Copied" : "Copy address to clipboard"}
         >
@@ -47,16 +47,16 @@ export function WalletProfileCard({ address, solBalance }: WalletProfileCardProp
         </Button>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+      <div className="mt-4 sm:mt-6">
+        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm">
           Balance
         </h3>
-        <p className="mt-1 text-3xl font-bold tracking-tight">
+        <p className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
           {solBalance.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 4,
           })}{" "}
-          <span className="text-xl font-medium text-muted-foreground">SOL</span>
+          <span className="text-lg font-medium text-muted-foreground sm:text-xl">SOL</span>
         </p>
       </div>
     </div>

@@ -68,38 +68,40 @@ export function ActivityCard({ activity }: ActivityCardProps) {
 
   return (
     <div
-      className={`relative flex items-center gap-4 rounded-lg p-4 transition-all ${cardStyles}`}
+      className={`relative flex flex-col gap-3 rounded-lg p-3 transition-all sm:flex-row sm:items-center sm:gap-4 sm:p-4 ${cardStyles}`}
     >
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconStyles}`}>
-        <Icon className="h-5 w-5" />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className={`truncate font-medium ${!successful ? "line-through decoration-destructive/50" : ""}`}>
-            {summary}
-          </p>
-          {!successful && (
-            <span className="shrink-0 rounded-full border border-destructive/50 bg-destructive/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive">
-              Failed
-            </span>
-          )}
+      <div className="flex items-center gap-3 sm:contents">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconStyles}`}>
+          <Icon className="h-5 w-5" />
         </div>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          {formatTimestamp(timestamp)}
-        </p>
+
+        <div className="min-w-0 flex-1 sm:flex-1">
+          <div className="flex items-center gap-2">
+            <p className={`truncate text-sm font-medium sm:text-base ${!successful ? "line-through decoration-destructive/50" : ""}`}>
+              {summary}
+            </p>
+            {!successful && (
+              <span className="shrink-0 rounded-full border border-destructive/50 bg-destructive/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-destructive">
+                Failed
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+            {formatTimestamp(timestamp)}
+          </p>
+        </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3 text-right">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-t pt-3 sm:justify-end sm:border-0 sm:pt-0 sm:text-right">
         <div>
           <p className="text-xs text-muted-foreground">Fee</p>
-          <p className="text-sm font-medium">{formatFee(fee)}</p>
+          <p className="text-xs font-medium sm:text-sm">{formatFee(fee)}</p>
         </div>
         <a
           href={solscanUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:h-8 sm:w-8"
           aria-label="View on Solscan"
         >
           <ExternalLink className="h-4 w-4" />
