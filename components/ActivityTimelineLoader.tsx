@@ -1,4 +1,5 @@
 import { ActivityTimeline } from "./ActivityTimeline";
+import { NetworkError } from "./NetworkError";
 import { getRecentTransactionSignatures } from "@/lib/services/wallet";
 import { parseTransactionSignaturesBatch } from "@/lib/services/parser";
 
@@ -10,7 +11,7 @@ export async function ActivityTimelineLoader({ address }: ActivityTimelineLoader
   const signaturesResult = await getRecentTransactionSignatures(address);
 
   if (!signaturesResult.success) {
-    return <ActivityTimeline activities={[]} />;
+    return <NetworkError message={signaturesResult.error} />;
   }
 
   const activities = await parseTransactionSignaturesBatch(

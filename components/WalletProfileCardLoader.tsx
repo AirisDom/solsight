@@ -1,4 +1,5 @@
 import { WalletProfileCard } from "./WalletProfileCard";
+import { NetworkError } from "./NetworkError";
 import { getSolBalance } from "@/lib/services/wallet";
 
 interface WalletProfileCardLoaderProps {
@@ -7,7 +8,10 @@ interface WalletProfileCardLoaderProps {
 
 export async function WalletProfileCardLoader({ address }: WalletProfileCardLoaderProps) {
   const result = await getSolBalance(address);
-  const solBalance = result.success ? result.balance : 0;
 
-  return <WalletProfileCard address={address} solBalance={solBalance} />;
+  if (!result.success) {
+    return <NetworkError message={result.error} />;
+  }
+
+  return <WalletProfileCard address={address} solBalance={result.balance} />;
 }

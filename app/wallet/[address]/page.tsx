@@ -4,6 +4,8 @@ import { WalletProfileCardLoader } from "@/components/WalletProfileCardLoader";
 import { ActivityTimelineLoader } from "@/components/ActivityTimelineLoader";
 import { WalletProfileCardSkeleton } from "@/components/WalletProfileCardSkeleton";
 import { ActivityTimelineSkeleton } from "@/components/ActivityTimelineSkeleton";
+import { InvalidAddressError } from "@/components/InvalidAddressError";
+import { validateSolanaAddress } from "@/lib/solana";
 
 interface WalletPageProps {
   params: Promise<{ address: string }>;
@@ -11,6 +13,21 @@ interface WalletPageProps {
 
 export default async function WalletPage({ params }: WalletPageProps) {
   const { address } = await params;
+  const decodedAddress = decodeURIComponent(address);
+
+  const validation = validateSolanaAddress(decodedAddress);
+
+  if (!validation.valid) {
+    return (
+      <>
+        <Navbar />
+        <InvalidAddressError
+          address={decodedAddress}
+          errorMessage={validation.error}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -20,13 +37,13 @@ export default async function WalletPage({ params }: WalletPageProps) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
               <Suspense fallback={<WalletProfileCardSkeleton />}>
-                <WalletProfileCardLoader address={address} />
+                <WalletProfileCardLoader address={validation.address} />
               </Suspense>
             </div>
 
             <div className="md:col-span-2">
               <Suspense fallback={<ActivityTimelineSkeleton />}>
-                <ActivityTimelineLoader address={address} />
+                <ActivityTimelineLoader address={validation.address} />
               </Suspense>
             </div>
           </div>
