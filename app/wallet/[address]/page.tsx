@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { WalletProfileCardLoader } from "@/components/WalletProfileCardLoader";
 import { ActivityTimelineLoader } from "@/components/ActivityTimelineLoader";
@@ -9,6 +10,40 @@ import { validateSolanaAddress } from "@/lib/solana";
 
 interface WalletPageProps {
   params: Promise<{ address: string }>;
+}
+
+function truncateAddress(address: string): string {
+  if (address.length <= 12) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+export async function generateMetadata({ params }: WalletPageProps): Promise<Metadata> {
+  const { address } = await params;
+  const decodedAddress = decodeURIComponent(address);
+  const validation = validateSolanaAddress(decodedAddress);
+
+  if (!validation.valid) {
+    return {
+      title: "Invalid Address",
+      description: "The provided Solana address is invalid.",
+    };
+  }
+
+  const truncated = truncateAddress(validation.address);
+
+  return {
+    title: `Wallet ${truncated}`,
+    description: `View transaction history and activity for Solana wallet ${validation.address}`,
+    openGraph: {
+      title: `Wallet ${truncated} | SolSight`,
+      description: `View transaction history and activity for Solana wallet ${validation.address}`,
+    },
+    twitter: {
+      card: "summary",
+      title: `Wallet ${truncated} | SolSight`,
+      description: `View transaction history and activity for Solana wallet ${validation.address}`,
+    },
+  };
 }
 
 export default async function WalletPage({ params }: WalletPageProps) {
