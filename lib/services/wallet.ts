@@ -1,47 +1,71 @@
 import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js';
 import { connection, LAMPORTS_PER_SOL, validateSolanaAddress } from '../solana';
+import { withRetry, DEFAULT_RETRY_OPTIONS } from '../retry';
+import { RpcErrorType } from '../errors';
 
 export const DEFAULT_TRANSACTION_LIMIT = 20;
 
 export type BalanceResult =
   | { success: true; balance: number; address: string }
-  | { success: false; error: string; address: string };
+  | { success: false; error: string; errorType: RpcErrorType; address: string; retryable: boolean };
 
 export async function getSolBalance(address: string): Promise<BalanceResult> {
   const validation = validateSolanaAddress(address);
 
   if (validation.valid === false) {
-    return { success: false, error: validation.error, address };
+    return {
+      success: false,
+      error: validation.error,
+      errorType: 'INVALID_RESPONSE',
+      address,
+      retryable: false,
+    };
   }
 
-  try {
-    const lamports = await connection.getBalance(validation.publicKey);
-    const balance = lamports / LAMPORTS_PER_SOL;
+  const result = await withRetry(
+    () => connection.getBalance(validation.publicKey),
+    DEFAULT_RETRY_OPTIONS
+  );
 
-    return { success: true, balance, address };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch balance';
-    return { success: false, error: message, address };
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.message,
+      errorType: result.error.type,
+      address,
+      retryable: result.error.retryable,
+    };
   }
+
+  const balance = result.data / LAMPORTS_PER_SOL;
+  return { success: true, balance, address };
 }
 
 export async function getSolBalanceFromPublicKey(publicKey: PublicKey): Promise<BalanceResult> {
   const address = publicKey.toBase58();
 
-  try {
-    const lamports = await connection.getBalance(publicKey);
-    const balance = lamports / LAMPORTS_PER_SOL;
+  const result = await withRetry(
+    () => connection.getBalance(publicKey),
+    DEFAULT_RETRY_OPTIONS
+  );
 
-    return { success: true, balance, address };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch balance';
-    return { success: false, error: message, address };
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.message,
+      errorType: result.error.type,
+      address,
+      retryable: result.error.retryable,
+    };
   }
+
+  const balance = result.data / LAMPORTS_PER_SOL;
+  return { success: true, balance, address };
 }
 
 export type TransactionSignaturesResult =
   | { success: true; signatures: ConfirmedSignatureInfo[]; address: string }
-  | { success: false; error: string; address: string };
+  | { success: false; error: string; errorType: RpcErrorType; address: string; retryable: boolean };
 
 export async function getRecentTransactionSignatures(
   address: string,
@@ -50,20 +74,31 @@ export async function getRecentTransactionSignatures(
   const validation = validateSolanaAddress(address);
 
   if (validation.valid === false) {
-    return { success: false, error: validation.error, address };
+    return {
+      success: false,
+      error: validation.error,
+      errorType: 'INVALID_RESPONSE',
+      address,
+      retryable: false,
+    };
   }
 
-  try {
-    const signatures = await connection.getSignaturesForAddress(
-      validation.publicKey,
-      { limit }
-    );
+  const result = await withRetry(
+    () => connection.getSignaturesForAddress(validation.publicKey, { limit }),
+    DEFAULT_RETRY_OPTIONS
+  );
 
-    return { success: true, signatures, address };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch transaction signatures';
-    return { success: false, error: message, address };
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.message,
+      errorType: result.error.type,
+      address,
+      retryable: result.error.retryable,
+    };
   }
+
+  return { success: true, signatures: result.data, address };
 }
 
 export async function getRecentTransactionSignaturesFromPublicKey(
@@ -72,15 +107,20 @@ export async function getRecentTransactionSignaturesFromPublicKey(
 ): Promise<TransactionSignaturesResult> {
   const address = publicKey.toBase58();
 
-  try {
-    const signatures = await connection.getSignaturesForAddress(
-      publicKey,
-      { limit }
-    );
+  const result = await withRetry(
+    () => connection.getSignaturesForAddress(publicKey, { limit }),
+    DEFAULT_RETRY_OPTIONS
+  );
 
-    return { success: true, signatures, address };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to fetch transaction signatures';
-    return { success: false, error: message, address };
+  if (!result.success) {
+    return {
+      success: false,
+      error: result.error.message,
+      errorType: result.error.type,
+      address,
+      retryable: result.error.retryable,
+    };
   }
+
+  return { success: true, signatures: result.data, address };
 }

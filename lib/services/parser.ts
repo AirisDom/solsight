@@ -4,6 +4,7 @@ import {
 } from '@solana/web3.js';
 import { ParsedActivity, TransactionType, TokenDirection } from '@/types';
 import { connection, LAMPORTS_PER_SOL } from '../solana';
+import { withRetry } from '../retry';
 
 const DEX_PROGRAM_IDS: Record<string, string> = {
   'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4': 'Jupiter',
@@ -57,19 +58,18 @@ export async function fetchAndParseTransaction(
   signature: string,
   walletAddress: string
 ): Promise<ParsedActivity | null> {
-  try {
-    const transaction = await connection.getParsedTransaction(signature, {
+  const result = await withRetry(
+    () => connection.getParsedTransaction(signature, {
       maxSupportedTransactionVersion: 0,
-    });
+    }),
+    { maxRetries: 2, initialDelayMs: 300 }
+  );
 
-    if (!transaction) {
-      return null;
-    }
-
-    return parseTransaction(transaction, walletAddress);
-  } catch {
+  if (!result.success || !result.data) {
     return null;
   }
+
+  return parseTransaction(result.data, walletAddress);
 }
 
 export function parseTransaction(
