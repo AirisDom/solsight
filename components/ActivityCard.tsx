@@ -12,17 +12,18 @@ interface ActivityCardProps {
   activity: ParsedActivity;
 }
 
-function getTypeIcon(type: TransactionType, direction: TokenDirection) {
-  switch (type) {
-    case "SWAP":
-      return ArrowLeftRight;
-    case "TRANSFER":
-      return direction === "IN" ? ArrowDown : ArrowUp;
-    case "MINT":
-      return Coins;
-    default:
-      return HelpCircle;
+interface TypeIconProps {
+  type: TransactionType;
+  direction: TokenDirection;
+}
+
+function TypeIcon({ type, direction }: TypeIconProps) {
+  if (type === "SWAP") return <ArrowLeftRight className="h-5 w-5" />;
+  if (type === "TRANSFER") {
+    return direction === "IN" ? <ArrowDown className="h-5 w-5" /> : <ArrowUp className="h-5 w-5" />;
   }
+  if (type === "MINT") return <Coins className="h-5 w-5" />;
+  return <HelpCircle className="h-5 w-5" />;
 }
 
 function getDirectionStyles(direction: TokenDirection, successful: boolean) {
@@ -58,7 +59,6 @@ function formatFee(lamports: number) {
 
 export function ActivityCard({ activity }: ActivityCardProps) {
   const { signature, timestamp, type, direction, summary, fee, successful } = activity;
-  const Icon = getTypeIcon(type, direction);
   const iconStyles = getDirectionStyles(direction, successful);
   const solscanUrl = `https://solscan.io/tx/${signature}`;
 
@@ -72,7 +72,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     >
       <div className="flex items-center gap-3 sm:contents">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconStyles}`}>
-          <Icon className="h-5 w-5" />
+          <TypeIcon type={type} direction={direction} />
         </div>
 
         <div className="min-w-0 flex-1 sm:flex-1">

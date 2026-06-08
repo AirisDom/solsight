@@ -1,7 +1,8 @@
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
 
 export const SOLANA_NETWORK = 'mainnet-beta' as const;
-export const SOLANA_RPC_ENDPOINT = clusterApiUrl(SOLANA_NETWORK);
+export const SOLANA_RPC_ENDPOINT =
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(SOLANA_NETWORK);
 export const LAMPORTS_PER_SOL = 1_000_000_000;
 
 export const connection = new Connection(SOLANA_RPC_ENDPOINT, 'confirmed');
