@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4">
       <div className="flex w-full max-w-xl flex-col items-center">
-        <h1 className="mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl">
+        <h1 className="animate-gradient mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-5xl font-bold tracking-tight text-transparent drop-shadow-sm sm:text-6xl md:text-7xl">
           SolSight
         </h1>
 
@@ -62,7 +62,7 @@ export default function Home() {
             <Input
               type="text"
               placeholder="Enter Solana Address (e.g., HN7c...)"
-              className="h-12 flex-1 text-base"
+              className="h-12 flex-1 text-base transition-shadow duration-200 focus:shadow-lg focus:shadow-purple-500/10"
               value={address}
               onChange={handleInputChange}
               aria-invalid={error ? true : undefined}
@@ -70,7 +70,7 @@ export default function Home() {
             <Button
               type="submit"
               size="lg"
-              className="h-12 w-full px-6 sm:w-auto"
+              className="h-12 w-full px-6 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] sm:w-auto"
               disabled={isLoading || !isAddressValid}
             >
               {isLoading ? (
@@ -81,9 +81,11 @@ export default function Home() {
               {isLoading ? "Loading..." : "Search"}
             </Button>
           </div>
-          {error && (
-            <p className="mt-2 text-sm text-destructive">{error}</p>
-          )}
+          <div className="h-6 mt-2">
+            {error && (
+              <p className="animate-in fade-in slide-in-from-top-1 text-sm text-destructive duration-200">{error}</p>
+            )}
+          </div>
         </form>
       </div>
     </main>

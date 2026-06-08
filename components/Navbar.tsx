@@ -52,7 +52,7 @@ export function Navbar() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-2 px-4 sm:gap-4">
         <Link
           href="/"
-          className="shrink-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-lg font-bold tracking-tight text-transparent sm:text-xl"
+          className="animate-gradient-hover shrink-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-[length:200%_200%] bg-clip-text text-lg font-bold tracking-tight text-transparent transition-all duration-300 hover:drop-shadow-sm sm:text-xl"
         >
           SolSight
         </Link>
@@ -76,7 +76,7 @@ export function Navbar() {
           <Button
             type="submit"
             size="sm"
-            className="h-10 w-10 shrink-0 p-0 sm:h-9 sm:w-auto sm:px-3"
+            className="h-10 w-10 shrink-0 p-0 transition-all duration-200 hover:scale-105 active:scale-95 sm:h-9 sm:w-auto sm:px-3"
             disabled={isLoading || !isAddressValid}
           >
             {isLoading ? (

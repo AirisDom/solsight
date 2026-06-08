@@ -63,12 +63,12 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const solscanUrl = `https://solscan.io/tx/${signature}`;
 
   const cardStyles = successful
-    ? "border bg-card hover:bg-accent/50"
-    : "border-destructive/30 bg-destructive/5 opacity-50 hover:opacity-60";
+    ? "border bg-card hover:bg-accent/50 hover:shadow-md hover:border-accent"
+    : "border-destructive/30 bg-destructive/5 opacity-50 hover:opacity-70";
 
   return (
     <div
-      className={`relative flex flex-col gap-3 rounded-lg p-3 transition-all sm:flex-row sm:items-center sm:gap-4 sm:p-4 ${cardStyles}`}
+      className={`relative flex flex-col gap-3 rounded-lg p-3 transition-all duration-200 sm:flex-row sm:items-center sm:gap-4 sm:p-4 ${cardStyles}`}
     >
       <div className="flex items-center gap-3 sm:contents">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconStyles}`}>
@@ -101,10 +101,10 @@ export function ActivityCard({ activity }: ActivityCardProps) {
           href={solscanUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:h-8 sm:w-8"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-all duration-200 hover:scale-110 hover:bg-accent hover:text-foreground sm:h-8 sm:w-8"
           aria-label="View on Solscan"
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />
         </a>
       </div>
     </div>

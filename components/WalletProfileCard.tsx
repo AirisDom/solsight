@@ -25,7 +25,7 @@ export function WalletProfileCard({ address, solBalance }: WalletProfileCardProp
   };
 
   return (
-    <div className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md sm:p-6 dark:border-white/10 dark:bg-white/5">
+    <div className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-white/30 hover:shadow-xl sm:p-6 dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20">
       <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground sm:text-sm">
         Wallet
       </h2>
@@ -35,14 +35,14 @@ export function WalletProfileCard({ address, solBalance }: WalletProfileCardProp
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 shrink-0 sm:h-8 sm:w-8"
+          className="h-10 w-10 shrink-0 transition-all duration-200 hover:scale-110 sm:h-8 sm:w-8"
           onClick={handleCopy}
           aria-label={copied ? "Copied" : "Copy address to clipboard"}
         >
           {copied ? (
-            <Check className="h-4 w-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-500 animate-in zoom-in duration-200" />
           ) : (
-            <Copy className="h-4 w-4" />
+            <Copy className="h-4 w-4 transition-transform duration-200 hover:rotate-[-8deg]" />
           )}
         </Button>
       </div>
